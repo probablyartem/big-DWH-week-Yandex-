@@ -1,0 +1,18 @@
+FROM bigdwhweek.gitlab.yandexcloud.net:5050/bigdwhweek/public-2025-spring/base-image:latest
+
+COPY . /opt/shad
+RUN python3 -m pip install /opt/shad/tools/testlib
+RUN cp /opt/shad/.gitlab-ci.yml /opt/shad/.grader-ci.yml  # Create reference for comparison when running tests
+
+RUN find /opt/shad/ -name '*.py' | xargs chmod o-rwx
+
+# debug
+RUN python3 -m pip uninstall -y manytask-checker
+# RUN python3 -m pip install --upgrade git+https://github.com/yandexdataschool/checker.git@detect-changes
+# RUN python3 -m pip install manytask-checker==0.9.0
+RUN python3 -m pip install git+https://github.com/manytask/checker.git@main
+
+#ADD "https://api.github.com/repos/Q-c7/checker-debug/commits?per_page=1" latest_commit
+#RUN python3 -m pip install --upgrade git+https://github.com/Q-c7/checker-debug.git
+#ADD "https://api.github.com/repos/yandexdataschool/checker/commits?per_page=1" latest_commit
+#RUN python3 -m pip install --upgrade git+https://github.com/yandexdataschool/checker.git@detect-changes

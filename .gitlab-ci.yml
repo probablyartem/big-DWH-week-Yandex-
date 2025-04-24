@@ -1,0 +1,54 @@
+# gitlab ci/cd file for students repo:
+# 1. grade students' tasks (and merge requests)
+# 2. grade students' merge requests to tests repo
+#
+# should be configured to run as external ci/cd file (from public repo)
+# students has developer role, so they can't change ci/cd settings, so the file is fixed
+
+variables:
+  GIT_DEPTH: 10
+  GIT_STRATEGY: clone
+  REGISTRY: bigdwhweek.gitlab.yandexcloud.net:5050/bigdwhweek/public-2025-spring
+  REF_DIR: /opt/shad
+
+
+# Testing and Grading all tasks
+grade:
+  image: $REGISTRY/testenv:latest
+  rules:
+    # never run in public repo
+    - if: $CI_PROJECT_NAME =~ /^public-(fall|spring)-20\d\d/
+      when: never
+    # never run on contributing branches
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /contributing/ || $CI_COMMIT_BRANCH =~ /contributing/
+      when: never
+    # otherwise run always
+    - when: on_success
+  script:
+    - python -m checker grade
+      --timestamp $CI_PIPELINE_CREATED_AT
+      --username $GITLAB_USER_LOGIN
+      --submit-score
+      --silent
+      -- $CI_PROJECT_DIR $REF_DIR
+  timeout: 10 minutes
+
+
+# Checking contribution to the public repo
+check:
+  image: $REGISTRY/testenv:latest
+  rules:
+    # never run in public repo
+    - if: $CI_PROJECT_NAME =~ /^public-(fall|spring)-20\d\d/
+      when: never
+    # run on contributing branches
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /contributing/ || $CI_COMMIT_BRANCH =~ /contributing/
+      when: on_success
+    # otherwise never run
+    - when: never
+  script:
+    - python -m checker check
+      --silent
+      --contributing
+      -- $CI_PROJECT_DIR $REF_DIR
+  timeout: 30 minutes
