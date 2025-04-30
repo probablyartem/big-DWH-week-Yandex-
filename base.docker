@@ -10,5 +10,5 @@ RUN apt-get update && \
 
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --upgrade -r /tmp/requirements.txt
-RUN python3 -m pip install ytsaurus-client
+RUN python3 -m pip install ytsaurus-client ytsaurus-yson
 RUN python3 -m pip install git+https://github.com/manytask/checker.git@main

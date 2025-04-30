@@ -39,6 +39,10 @@ class RunPytestPlugin(RunScriptPlugin):
         env_whitelist.append("YT_PROXY")
         env_whitelist.append("YT_TOKEN")
 
+        env_whitelist.append("TABLE_ODS")
+        env_whitelist.append("TABLE_DDS")
+        env_whitelist.append("TABLE_CDM")
+
         run_script_args = RunScriptPlugin.Args(
             origin=args.origin,
             script=' '.join(tests_cmd + [args.target]),  # TODO: check, not working when list
