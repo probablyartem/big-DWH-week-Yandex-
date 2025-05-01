@@ -11,15 +11,15 @@
 
 | \# | name            | type                |описание                       |
 |----|-----------------|---------------------|-------------------------------|
-| 1	 | cyr	           | String[optional]    |валюта покупки                 |
-| 2	 | item_count	   | Int64[optional]     |кол-во позиций заказа в заказе |
-| 3	 | item_id	       | Int64[optional]     |идентификатор внутри заказов   |
-| 4	 | item_price	   | Int64[optional]     |цена позиции заказа            |
-| 5	 | order_id	       | Int64               |номер заказа                   |
-| 6	 | order_status	   | String              |стаус заказа                   |
-| 7	 | sku	           | Int64[optional]     |артикул позиции заказа         |
-| 8	 | user_id	       | Int64               |идентификатор пользователя     |
-| 9	 | create_datetime | Datetime[optional]  |время создания события         |
+| 1	 | item_id	       | Int64[optional]     |идентификатор внутри заказов   |
+| 2	 | create_datetime | Datetime[optional]  |время создания события         |
+| 3	 | cyr	           | String[optional]    |валюта покупки                 |
+| 4	 | item_count	   | Int64[optional]     |кол-во позиций заказа в заказе |
+| 5	 | item_price	   | Int64[optional]     |цена позиции заказа            |
+| 6	 | order_id	       | Int64               |номер заказа                   |
+| 7	 | order_status	   | String              |стаус заказа                   |
+| 8	 | sku	           | Int64[optional]     |артикул позиции заказа         |
+| 9	 | user_id	       | Int64               |идентификатор пользователя     |
 
 Также схема таблицы есть в папке с задачей: //home/homework_task_dwh
 

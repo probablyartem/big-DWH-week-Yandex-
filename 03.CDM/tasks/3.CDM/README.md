@@ -13,11 +13,11 @@
 Схема таблицы приложена ниже:
 | \# | name                     | type                |
 |----|--------------------------|---------------------|
-| 1	 | best_sku	                | Int64[optional]     |
-| 2	 | best_sku_price	        | Int64[optional]     |
-| 3	 | count_pay_item	        | Int64[optional]     |
-| 4	 | avg_order_completion_day	| Int64[optional]     |
-| 5	 | user_id	                | Int64               |
+| 1	 | user_id	                | Int64               |
+| 2	 | avg_order_completion_day	| Int64[optional]     |
+| 3	 | best_sku	                | Int64[optional]     |
+| 4	 | best_sku_price	        | Int64[optional]     |
+| 5	 | count_pay_item	        | Int64[optional]     |
 
 Также схема таблицы есть в папке с задачей: //home/homework_task_dwh
 

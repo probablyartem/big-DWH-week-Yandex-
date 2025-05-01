@@ -12,16 +12,17 @@
 
 | \# | name            | type               |
 |----|-----------------|--------------------|
-| 1	 | cyr	           | String[optional]   |
-| 2	 | item_count	   | Int64[optional]    |
-| 3	 | item_id	       | Int64[optional]    |
-| 4	 | item_price	   | Int64[optional]    |
-| 5	 | order_id	       | Int64              |
-| 6	 | order_status	   | String             |
-| 7	 | sku	           | Int64[optional]    |
-| 8	 | user_id	       | Int64              |
-| 9	 | valid_from_dttm | Datetime[optional] |
-| 10 | valid_to_dttm   | Datetime[optional] |
+| 1	 | order_id	       | Int64              |
+| 2	 | item_id	       | Int64[optional]    |
+| 3	 | valid_from_dttm | Datetime[optional] |
+| 4  | valid_to_dttm   | Datetime[optional] |
+| 5	 | cyr	           | String[optional]   |
+| 6	 | item_count	   | Int64[optional]    |
+| 7	 | item_price	   | Int64[optional]    |
+| 8	 | order_status	   | String             |
+| 9	 | sku	           | Int64[optional]    |
+| 10 | user_id	       | Int64              |
+
 
 Также схема таблицы есть в папке с задачей: //home/homework_task_dwh
 
