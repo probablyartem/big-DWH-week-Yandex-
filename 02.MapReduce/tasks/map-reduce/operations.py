@@ -106,10 +106,12 @@ class Join(Operation):
     def grouper(self,
                 records: TRowsIterable) -> tp.Generator[tp.Tuple[tp.Optional[tp.Any],
                 tp.Optional[tp.List[TRow]]], None, None]:
+        from itertools import groupby
+        from operator import itemgetter
         """Группирует записи по ключу и возвращает пары (ключ_кортеж, итератор_группы)."""
         key_func = itemgetter(*self.keys)
-        for key_tuple, group_iter in groupby(records, key=key_func):
-            yield key_tuple, group_iter
+        for key, group in groupby(records, key=key_func):
+            yield key, list(group)
 
         yield None, None 
 
@@ -120,30 +122,28 @@ class Join(Operation):
         group_gen_a = self.grouper(rows)
         group_gen_b = self.grouper(rows_right_stream)
         
-        key_a, group_a_iter = next(group_gen_a)
-        key_b, group_b_iter = next(group_gen_b)
+        key_a, group_a = next(group_gen_a)
+        key_b, group_b = next(group_gen_b)
         
         while key_a is not None and key_b is not None:
-
-
-            if key_a < key_b:
-                yield from self.joiner(self.keys, group_a_iter, iter([]))
-                key_a, group_a_iter = next(group_gen_a)
-            elif key_a > key_b:
-                yield from self.joiner(self.keys, iter([]), group_b_iter)
-                key_b, group_b_iter = next(group_gen_b)
-            else: 
-                yield from self.joiner(self.keys, group_a_iter, group_b_iter)
-                key_a, group_a_iter = next(group_gen_a)
-                key_b, group_b_iter = next(group_gen_b)
-        
+                if key_a < key_b:
+                    yield from self.joiner(self.keys, group_a or [], [])
+                    key_a, group_a = next(group_gen_a)
+                elif key_a > key_b:
+                    yield from self.joiner(self.keys, [], group_b or [])
+                    key_b, group_b = next(group_gen_b)
+                else: 
+                    yield from self.joiner(self.keys, group_a or [], group_b or [])
+                    key_a, group_a = next(group_gen_a)
+                    key_b, group_b = next(group_gen_b)
+            
         while key_a is not None:
-            yield from self.joiner(self.keys, group_a_iter, iter([]))
-            key_a, group_a_iter = next(group_gen_a)
+            yield from self.joiner(self.keys, group_a or [], [])
+            key_a, group_a = next(group_gen_a)
             
         while key_b is not None:
-            yield from self.joiner(self.keys, iter([]), group_b_iter)
-            key_b, group_b_iter = next(group_gen_b)
+            yield from self.joiner(self.keys, [], group_b or [])
+            key_b, group_b = next(group_gen_b)
 
 # Dummy operators
 
@@ -184,7 +184,7 @@ class LowerCase(Mapper):
         self.column = column
 
     @staticmethod
-    def _lower_case(txt: str):
+    def _lower_case(txt: str) -> str:
         return txt.lower()
 
     def __call__(self, row: TRow) -> TRowsGenerator:
