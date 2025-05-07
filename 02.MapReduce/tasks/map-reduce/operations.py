@@ -117,7 +117,7 @@ class Join(Operation):
     def __call__(self, rows: TRowsIterable, *args: tp.Any, **kwargs: tp.Any) -> TRowsGenerator:
         rows_right_stream: TRowsIterable = args[0]
         
-        group_gen_a = self.grouper(rows_left_stream)
+        group_gen_a = self.grouper(rows)
         group_gen_b = self.grouper(rows_right_stream)
         
         key_a, group_a_iter = next(group_gen_a)
