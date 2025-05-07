@@ -87,7 +87,9 @@ class Joiner(ABC):
         self._b_suffix = suffix_b
 
     @abstractmethod
-    def __call__(self, keys: tp.Sequence[str], rows_a: TRowsIterable, rows_b: TRowsIterable) -> TRowsGenerator:
+    def __call__(self,
+                keys: tp.Sequence[str],
+                rows_a: TRowsIterable, rows_b: TRowsIterable) -> TRowsGenerator:
         """
         :param keys: join keys
         :param rows_a: left table rows
@@ -101,7 +103,9 @@ class Join(Operation):
         self.keys = keys
         self.joiner = joiner
         
-    def grouper(self, records: TRowsIterable) -> tp.Generator[tp.Tuple[tp.Any, tp.Iterable[TRow]], None, None]:
+    def grouper(self,
+                records: TRowsIterable) -> tp.Generator[tp.Tuple[tp.Optional[tp.Any],
+                tp.Optional[tp.List[TRow]]], None, None]:
         """Группирует записи по ключу и возвращает пары (ключ_кортеж, итератор_группы)."""
         key_func = itemgetter(*self.keys)
         for key_tuple, group_iter in groupby(records, key=key_func):
@@ -110,7 +114,7 @@ class Join(Operation):
         yield None, None 
 
 
-    def __call__(self, rows_left_stream: TRowsIterable, *args: tp.Any, **kwargs: tp.Any) -> TRowsGenerator:
+    def __call__(self, rows: TRowsIterable, *args: tp.Any, **kwargs: tp.Any) -> TRowsGenerator:
         rows_right_stream: TRowsIterable = args[0]
         
         group_gen_a = self.grouper(rows_left_stream)
@@ -339,6 +343,7 @@ class TermFrequency(Reducer):
 
     def __call__(self, group_key: tuple[str, ...], rows: TRowsIterable) -> TRowsGenerator:
         from collections import Counter
+        word_counts: tp.Dict[str, int] = Counter()
         word_counts = Counter()
         total_words = 0
         first_row = None
@@ -427,7 +432,11 @@ class Sum(Reducer):
 
 class InnerJoiner(Joiner):
     """Join with inner strategy"""
-    def __call__(self, keys: tp.Sequence[str], rows_a_iter: TRowsIterable, rows_b_iter: TRowsIterable) -> TRowsGenerator:
+    def __call__(
+            self,
+            keys: tp.Sequence[str],
+            rows_a_iter: TRowsIterable, 
+            rows_b_iter: TRowsIterable) -> TRowsGenerator:
         materialized_b = list(rows_b_iter)
         
         if not materialized_b:
@@ -456,7 +465,10 @@ class InnerJoiner(Joiner):
 
 class OuterJoiner(Joiner):
     """Join with outer strategy"""
-    def __call__(self, keys: tp.Sequence[str], rows_a_iter: TRowsIterable, rows_b_iter: TRowsIterable) -> TRowsGenerator:
+    def __call__(self,
+                keys: tp.Sequence[str], 
+                rows_a_iter: TRowsIterable, 
+                rows_b_iter: TRowsIterable) -> TRowsGenerator:
 
         
         list_a = list(rows_a_iter)
@@ -494,7 +506,10 @@ class OuterJoiner(Joiner):
 
 class LeftJoiner(Joiner):
     """Join with left strategy"""
-    def __call__(self, keys: tp.Sequence[str], rows_a_iter: TRowsIterable, rows_b_iter: TRowsIterable) -> TRowsGenerator:
+    def __call__(self,
+                keys: tp.Sequence[str], 
+                rows_a_iter: TRowsIterable, 
+                rows_b_iter: TRowsIterable) -> TRowsGenerator:
         materialized_b = list(rows_b_iter)
         
         for row_a in rows_a_iter:
@@ -520,7 +535,10 @@ class LeftJoiner(Joiner):
                 yield row_a.copy()
 class RightJoiner(Joiner):
     """Join with right strategy"""
-    def __call__(self, keys: tp.Sequence[str], rows_a_iter: TRowsIterable, rows_b_iter: TRowsIterable) -> TRowsGenerator:
+    def __call__(self, 
+                keys: tp.Sequence[str],
+                rows_a_iter: TRowsIterable, 
+                rows_b_iter: TRowsIterable) -> TRowsGenerator:
         materialized_a = list(rows_a_iter)
         
         for row_b in rows_b_iter:
