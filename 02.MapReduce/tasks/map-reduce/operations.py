@@ -204,20 +204,51 @@ class Split(Mapper):
         from copy import deepcopy
         import re
         
-        if self.separator is None:
-            parts = re.split(r'\s+', row[self.column])
-        else:
-            parts = row[self.column].split(self.separator)
+        text = row[self.column]
         
-        has_parts = False
-        for part in parts:
-            if part:
+        if self.separator is None:
+            pattern = re.compile(r'\s+')
+            start = 0
+            has_parts = False
+            
+            for match in pattern.finditer(text):
+                end = match.start()
+                if start < end: 
+                    has_parts = True
+                    row_copy = deepcopy(row)
+                    row_copy[self.column] = text[start:end]
+                    yield row_copy
+                start = match.end()
+            
+            if start < len(text):
                 has_parts = True
                 row_copy = deepcopy(row)
-                row_copy[self.column] = part
+                row_copy[self.column] = text[start:]
+                yield row_copy
+        else:
+            start = 0
+            has_parts = False
+            
+            sep_len = len(self.separator)
+            pos = text.find(self.separator)
+            
+            while pos != -1:
+                if pos > start: 
+                    has_parts = True
+                    row_copy = deepcopy(row)
+                    row_copy[self.column] = text[start:pos]
+                    yield row_copy
+                
+                start = pos + sep_len
+                pos = text.find(self.separator, start)
+            
+            if start < len(text):
+                has_parts = True
+                row_copy = deepcopy(row)
+                row_copy[self.column] = text[start:]
                 yield row_copy
         
-        if not has_parts and parts:
+        if not has_parts and text:
             row_copy = deepcopy(row)
             row_copy[self.column] = ""
             yield row_copy
