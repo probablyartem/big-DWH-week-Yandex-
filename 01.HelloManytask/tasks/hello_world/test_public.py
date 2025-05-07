@@ -13,6 +13,7 @@ class Case:
 
 
 TEST_CASES = [
+
     Case(name='basic', expected='Hello world!')
 ]
 
