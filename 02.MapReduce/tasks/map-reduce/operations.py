@@ -103,12 +103,12 @@ class Join(Operation):
         
     def grouper(self, records: TRowsIterable) -> tp.Generator[tp.Tuple[tp.Any, tp.Iterable[TRow]], None, None]:
         """Группирует записи по ключу и возвращает пары (ключ_кортеж, итератор_группы)."""
-        # groupby requires input sorted by the key.
-        # The problem implies inputs to Join operations are sorted.
         key_func = itemgetter(*self.keys)
         for key_tuple, group_iter in groupby(records, key=key_func):
-            yield key_tuple, group_iter # Pass iterator, not list(group)
-        yield None, None # Sentinel for end of groups
+            yield key_tuple, group_iter
+
+        yield None, None 
+
 
     def __call__(self, rows_left_stream: TRowsIterable, *args: tp.Any, **kwargs: tp.Any) -> TRowsGenerator:
         rows_right_stream: TRowsIterable = args[0]
@@ -120,9 +120,8 @@ class Join(Operation):
         key_b, group_b_iter = next(group_gen_b)
         
         while key_a is not None and key_b is not None:
-            # Standardize key representation for comparison if only one join key
-            # itemgetter('col1') returns value, itemgetter('col1', 'col2') returns tuple
-            # groupby key will match this. Direct comparison key_a < key_b should work.
+
+
             if key_a < key_b:
                 yield from self.joiner(self.keys, group_a_iter, iter([]))
                 key_a, group_a_iter = next(group_gen_a)
@@ -488,7 +487,6 @@ class LeftJoiner(Joiner):
             
             if not joined_once_for_row_a:
                 yield row_a.copy()
-
 class RightJoiner(Joiner):
     """Join with right strategy"""
     def __call__(self, keys: tp.Sequence[str], rows_a_iter: TRowsIterable, rows_b_iter: TRowsIterable) -> TRowsGenerator:
