@@ -1,4 +1,4 @@
 def get_hello_world() -> str:
-    """
-    :return: hello world string
-    """
+    print('Hello world!')
+    return 'Hello world!'  
+
