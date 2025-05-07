@@ -4,4 +4,4 @@ def get_string() -> str:
     
     :return: строка с именем гарантированно существующего узла
     """
-    return "//"
+    return "//tmp"
