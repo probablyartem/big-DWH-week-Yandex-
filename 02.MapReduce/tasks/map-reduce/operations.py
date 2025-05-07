@@ -72,8 +72,7 @@ class Reduce(Operation):
         self.keys = keys
 
     def __call__(self, rows: TRowsIterable, *args: tp.Any, **kwargs: tp.Any) -> TRowsGenerator:
-        from itertools import groupby
-        from operator import itemgetter
+
         
         key_func = itemgetter(*self.keys)
         for _, group in groupby(rows, key_func):
@@ -106,8 +105,6 @@ class Join(Operation):
     def grouper(self,
                 records: TRowsIterable) -> tp.Generator[tp.Tuple[tp.Optional[tp.Any],
                 tp.Optional[tp.List[TRow]]], None, None]:
-        from itertools import groupby
-        from operator import itemgetter
         """Группирует записи по ключу и возвращает пары (ключ_кортеж, итератор_группы)."""
         key_func = itemgetter(*self.keys)
         for key, group in groupby(records, key=key_func):
