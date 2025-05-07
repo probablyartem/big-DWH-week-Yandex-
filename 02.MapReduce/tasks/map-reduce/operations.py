@@ -105,28 +105,31 @@ class Join(Operation):
     def grouper(
         self, 
         records: TRowsIterable
-        ) -> tp.Generator[tp.Tuple[tp.Optional[tp.Any], tp.Optional[tp.List[TRow]]], None, None]:
+    ) -> tp.Generator[tp.Tuple[tp.Optional[tp.Any], tp.List[TRow]], None, None]:
         """Группирует записи по ключу и возвращает пары (ключ, группа)."""
         key_func = itemgetter(*self.keys)
         
-        current_key = None
-        current_group = []
-        
-        for record in records:
-            record_key = key_func(record)
+        # Используем классический groupby из itertools
+        # Но важный момент - не материализуем группы слишком большого размера
+        for key, group_iter in groupby(records, key=key_func):
+            # Формируем группы по частям для экономии памяти
+            batch_size = 1000  # Небольшой размер для поддержания низкого использования памяти
+            batch = []
             
-            if current_key is not None and current_key != record_key:
-                yield current_key, current_group
-                current_group = []
+            for record in group_iter:
+                batch.append(record)
+                if len(batch) >= batch_size:
+                    # Если собрали достаточно записей для одного ключа, возвращаем их
+                    yield key, batch
+                    # Важно - создаем новый список для следующей партии
+                    batch = []
             
-            current_key = record_key
-            current_group.append(record)
+            # Если остались записи, возвращаем последнюю партию для этого ключа
+            if batch:
+                yield key, batch
         
-        if current_key is not None:
-            yield current_key, current_group
-        
-        yield None, None
-
+        # Сигнал конца - всегда возвращаем пустой список, не None
+        yield None, []
 
     def __call__(self, rows: TRowsIterable, *args: tp.Any, **kwargs: tp.Any) -> TRowsGenerator:
         rows_right_stream: TRowsIterable = args[0]
