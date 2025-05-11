@@ -2,4 +2,4 @@ def get_table_path() -> str:
    
 
     " "
-    return "//home/tmp/dk/ods_test_1"
+    return "//home/tmp/ods_1_dunai_try6"
